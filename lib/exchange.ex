@@ -4,6 +4,8 @@ defmodule Exchange do
 
   Assumptions:
 
+    * asks and bids should be managed separately (as I understand the problem) and merged only
+      for actual show of order books, actually it needs further clarifications.
     * `:new` for the existing values(or low values) happens not so oft, as it rebuilds keys for
       all further indexes
     * keys should be sorted for more efficient `order_book` function. For the case that insert
@@ -15,13 +17,17 @@ defmodule Exchange do
       * should be filled with zeros (chosen at the moment)
       * should 2 be ignored?
 
-  Actually for persistent storage some real database should be used, but for this simplified
-  example rocksdb was used (as it allows sorted keys iterators).
+  Actually for persistent storage some real database should be used (depending on the system), but
+  for this simplified example rocksdb was used (as it allows sorted keys iterators) and can replace
+  our tree.
 
     * Current limitation, only one process can be started with `persistent: true`, so further
       changes for interface needed (for example using `name` to identify which order booking
       is used).
 
+  Direct replacement of a datastructure was chosen based on time constraints, so actually internal
+  datastructure should be used a state cache for a database (or may be accumulation for frequent
+  order book requests).
 
   Proposal for changes in challenge:
 
@@ -134,7 +140,7 @@ defmodule Exchange do
     end
   end
 
-  # We calculate one order starting from 1
+  # We calculate one order starting from 1 based on assumption
   defp calc_order_book(%{asks: asks, bids: bids}, book_depth) do
     asks_next = first_next(asks)
     bids_next = first_next(bids)

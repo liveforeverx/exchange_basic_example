@@ -46,7 +46,6 @@ defmodule Exchange.Db do
   Remove one object from a store
   """
   def delete(name \\ __MODULE__, key) do
-    IO.inspect({:delete, key})
     db = db(name)
     :rocksdb.delete(db, key, [])
   end

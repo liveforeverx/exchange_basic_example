@@ -12,7 +12,7 @@ defmodule Exchange.App do
 
   @doc """
   Actually better way to know upfront if we need persistence or not, so that we can add our
-  persistent layer upfront.
+  persistent layer in a supervision tree upfront.
   """
   def ensure_persistent!() do
     case Supervisor.start_child(Exchange.Supervisor, Exchange.Db) do
