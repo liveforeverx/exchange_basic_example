@@ -135,8 +135,12 @@ defmodule Exchange do
 
   defp elements(iter, index, elements) do
     case Tree.next(iter) do
-      {{key, value}, iter} when key >= index -> elements(iter, index, [{key, value} | elements])
-      _ -> elements
+      {{key, value}, iter} when key >= index ->
+        elements(iter, index, [{key, value} | elements])
+
+      _ ->
+        Tree.iter_close(iter)
+        elements
     end
   end
 
@@ -147,8 +151,11 @@ defmodule Exchange do
     do_calc_order_book(asks_next, bids_next, 1, book_depth, [])
   end
 
-  defp do_calc_order_book(_asks_next, _bids_next, index, book_depth, acc)
+  defp do_calc_order_book({_, asks_iter}, {_, bids_iter}, index, book_depth, acc)
        when index > book_depth do
+    # TODO: Actually would be better to have fold with automatic closing after usage
+    Tree.iter_close(asks_iter)
+    Tree.iter_close(bids_iter)
     Enum.reverse(acc)
   end
 
