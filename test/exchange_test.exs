@@ -42,6 +42,30 @@ defmodule ExchangeTest do
              %{ask_price: 70.0, ask_quantity: 20, bid_price: 40.0, bid_quantity: 40},
              %{ask_price: 0.0, ask_quantity: 0, bid_price: 0.0, bid_quantity: 0}
            ] == Exchange.order_book(pid, 3)
+
+    # Test shift delete
+    instruction = build_instr(:delete, :ask, 2, 0.0, 0)
+    Exchange.send_instruction(pid, instruction)
+    instruction = build_instr(:new, :bid, 3, 45.0, 5)
+    Exchange.send_instruction(pid, instruction)
+    instruction = build_instr(:delete, :bid, 1, 0.0, 0)
+    Exchange.send_instruction(pid, instruction)
+
+    assert [
+             %{ask_price: 60.0, ask_quantity: 10, bid_price: 40.0, bid_quantity: 40},
+             %{ask_price: 0.0, ask_quantity: 0, bid_price: 45.0, bid_quantity: 5},
+             %{ask_price: 0.0, ask_quantity: 0, bid_price: 0.0, bid_quantity: 0}
+           ] == Exchange.order_book(pid, 3)
+
+    # Test shift insert
+    instruction = build_instr(:new, :bid, 1, 20.0, 10)
+    Exchange.send_instruction(pid, instruction)
+
+    assert [
+             %{ask_price: 60.0, ask_quantity: 10, bid_price: 20.0, bid_quantity: 10},
+             %{ask_price: 0.0, ask_quantity: 0, bid_price: 40.0, bid_quantity: 40},
+             %{ask_price: 0.0, ask_quantity: 0, bid_price: 45.0, bid_quantity: 5}
+           ] == Exchange.order_book(pid, 3)
   end
 
   test "persistent example" do

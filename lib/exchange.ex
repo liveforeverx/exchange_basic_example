@@ -122,7 +122,7 @@ defmodule Exchange do
 
   defp instruction_on_tree(tree, %{instruction: :delete} = instruction) do
     %{price_level_index: index} = instruction
-    tree = tree |> shift(index, -1) |> Tree.delete(index)
+    tree = tree |> Tree.delete(index) |> shift(index, -1)
     {:ok, tree}
   end
 
